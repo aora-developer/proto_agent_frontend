@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import '../App.css'; 
+import '../App.css'; // 更新为相对于src目录的正确路径
 
 function AlertDialog({ children }) {
   return <div className="alert-dialog">{children}</div>;
 }
 
 export function AlertDialogTrigger({ asChild, children }) {
-  return React.cloneElement(children, { onClick: () => setOpen(true) });
+  const [open, setOpen] = useState(false);
+
+  const handleClick = () => {
+    setOpen(true);
+  };
+
+  return React.cloneElement(children, { onClick: handleClick });
 }
 
 export function AlertDialogContent({ children }) {
