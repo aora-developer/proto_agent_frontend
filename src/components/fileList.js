@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Button, AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@components/ui';
 import { Eye, Trash2 } from 'react-feather';
+import { Button, AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@components/ui';
 
 function FileList({ documents }) {
   const [previewDoc, setPreviewDoc] = useState(null);
@@ -10,7 +10,7 @@ function FileList({ documents }) {
   };
 
   const handleDelete = (id) => {
-    // Delete file
+    // Logic for file delete
   };
 
   return (
