@@ -1,21 +1,76 @@
+:root {
+  --sidebar-bg-color: #f4f4f4;
+  --content-padding: 20px;
+  --card-bg-color: #fff;
+  --card-padding: 20px;
+  --card-margin-bottom: 20px;
+  --card-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --text-color: #333;
+  --header-bg-color: #f8f9fa;
+  --header-text-color: #495057;
+  --border-color: #dee2e6;
+}
+
 .App {
   display: flex;
+  min-height: 100vh;
 }
 
 .sidebar {
   width: 200px;
-  background-color: #f4f4f4;
-  padding: 20px;
+  background-color: var(--sidebar-bg-color);
+  padding: var(--content-padding);
 }
 
 .content {
   flex: 1;
-  padding: 20px;
+  padding: var(--content-padding);
 }
 
 .card {
-  background-color: #fff;
-  padding: 20px;
-  margin-bottom: 20px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  background-color: var(--card-bg-color);
+  padding: var(--card-padding);
+  margin-bottom: var(--card-margin-bottom);
+  box-shadow: var(--card-box-shadow);
+  border-radius: 8px;
+}
+
+.table-header {
+  background-color: var(--header-bg-color);
+  color: var(--header-text-color);
+  padding: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  padding: 10px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table-row:nth-child(even) {
+  background-color: #f9f9f9;
+}
+
+.table-row div {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.table-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.table-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.table-actions button:hover {
+  color: #007bff;
 }
