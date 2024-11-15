@@ -1,7 +1,16 @@
 import React, { useState } from 'react';
 import { Eye, Trash2 } from 'react-feather';
-import { Button, AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@components/ui';
-
+import Button from './button'; 
+import AlertDialog, {
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction
+} from './alertDialog'; 
 function FileList({ documents }) {
   const [previewDoc, setPreviewDoc] = useState(null);
 
