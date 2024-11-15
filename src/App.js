@@ -1,8 +1,8 @@
 import React from 'react';
-import Sidebar from './components/Sidebar';
-import FileUpload from './components/FileUpload';
-import FileList from './components/FileList';
-import UserSettings from './components/UserSettings';
+import Sidebar from './components/sidebar.js';
+import FileUpload from './components/fileUpload.js';
+import FileList from './components/fileList.js';
+import UserSettings from './components/userSettings.js';
 import './App.css';
 
 function App() {
