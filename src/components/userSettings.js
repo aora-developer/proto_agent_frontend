@@ -1,25 +1,24 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 function UserSettings() {
-  const [instanceUrl, setInstanceUrl] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-
   return (
-    <div className="card">
-      <h3>User Settings</h3>
-      <div>
-        <label>ServiceNow Instance URL:</label>
-        <input type="text" value={instanceUrl} onChange={(e) => setInstanceUrl(e.target.value)} />
-      </div>
-      <div>
-        <label>username:</label>
-        <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
-      </div>
-      <div>
-        <label>password:</label>
-        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
-      </div>
+    <div className="user-settings">
+      <h3>ServiceNow Settings</h3>
+      <form>
+        <label>
+          Instance URL:
+          <input type="text" name="instanceUrl" />
+        </label>
+        <label>
+          Username:
+          <input type="text" name="username" />
+        </label>
+        <label>
+          Password:
+          <input type="password" name="password" />
+        </label>
+        <button type="submit">Save</button>
+      </form>
     </div>
   );
 }

@@ -1,35 +1,74 @@
 import React, { useState } from 'react';
+import { Button, AlertDialog, AlertDialogTrigger, AlertDialogContent, AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from '@components/ui';
+import { Eye, Trash2 } from 'react-feather';
 
-function FileList() {
-  const [files, setFiles] = useState([
-    { name: 'file1.txt', type: 'text', status: 'uploaded', date: '2024-11-15' },
-    { name: 'file2.jpg', type: 'image', status: 'uploaded', date: '2024-11-14' }
-  ]);
+function FileList({ documents }) {
+  const [previewDoc, setPreviewDoc] = useState(null);
 
-  const handleDelete = (fileName) => {
-    if (window.confirm(`Are you sure to delete ${fileName} ?`)) {
-      setFiles(files.filter(file => file.name !== fileName));
-    }
+  const handlePreview = (doc) => {
+    setPreviewDoc(doc);
   };
 
-  const handlePreview = (fileName) => {
-    alert(`Preview: ${fileName}`);
+  const handleDelete = (id) => {
+    // Delete file
   };
 
   return (
-    <div className="card">
-      <h3>Uploaded Files</h3>
-      <ul>
-        {files.map(file => (
-          <li key={file.name}>
-            <span onClick={() => handlePreview(file.name)}>{file.name}</span>
-            <button onClick={() => handleDelete(file.name)}>Delete</button>
-            <div>File Type: {file.type}</div>
-            <div>File Status: {file.status}</div>
-            <div>Uploaded Date: {file.date}</div>
-          </li>
-        ))}
-      </ul>
+    <div className="border rounded-lg">
+      <div className="min-w-full divide-y">
+        <div className="bg-gray-50">
+          <div className="grid grid-cols-5 gap-4 px-6 py-3 text-sm font-medium text-gray-500">
+            <div>File Name</div>
+            <div>File Type</div>
+            <div>File Status</div>
+            <div>Uploaded Date</div>
+            <div>Edit</div>
+          </div>
+        </div>
+        <div className="bg-white divide-y">
+          {documents.map((doc) => (
+            <div key={doc.id} className="grid grid-cols-5 gap-4 px-6 py-4 text-sm text-gray-900">
+              <div className="truncate" onClick={() => handlePreview(doc)}>{doc.name}</div>
+              <div>{doc.type}</div>
+              <div>{doc.status}</div>
+              <div>{doc.created}</div>
+              <div className="flex space-x-2">
+                <Button variant="ghost" size="icon">
+                  <Eye className="w-4 h-4" />
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="ghost" size="icon">
+                      <Trash2 className="w-4 h-4 text-red-500" />
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Document</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete this document? This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleDelete(doc.id)}>
+                        Delete
+                      </AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      {previewDoc && (
+        <div className="preview-dialog">
+          <h3>Preview: {previewDoc.name}</h3>
+          <p>{previewDoc.content}</p>
+          <Button onClick={() => setPreviewDoc(null)}>Close</Button>
+        </div>
+      )}
     </div>
   );
 }

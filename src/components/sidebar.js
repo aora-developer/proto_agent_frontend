@@ -1,12 +1,12 @@
 import React from 'react';
 
-function Sidebar() {
+function Sidebar({ onSelect }) {
   return (
     <div className="sidebar">
-      <h2>Navigation</h2>
+      <h2>RAG Management</h2>
       <ul>
-        <li>RAG Data Management</li>
-        <li>User Settings</li>
+        <li onClick={() => onSelect('documents')}>RAG Documents</li>
+        <li onClick={() => onSelect('settings')}>ServiceNow Settings</li>
       </ul>
     </div>
   );
