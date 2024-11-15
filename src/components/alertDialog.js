@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import './App.css'; 
+import '../App.css';
 
 export function AlertDialog({ children }) {
   return <div className="alert-dialog">{children}</div>;
