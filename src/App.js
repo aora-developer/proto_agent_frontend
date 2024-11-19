@@ -8,27 +8,78 @@ import './App.css';
 function App() {
   const [selectedPage, setSelectedPage] = useState('documents');
 
+  const [documents, setDocuments] = useState([
+    {
+      id: 1,
+      name: 'Sample Document',
+      type: 'PDF',
+      status: 'Active',
+      created: '2024-02-19',
+      content: 'Sample content'
+    }
+  ]);
+
+  const handleDelete = (id) => {
+    setDocuments(prevDocs => prevDocs.filter(doc => doc.id !== id));
+  };
+
   const renderContent = () => {
     switch (selectedPage) {
       case 'documents':
         return (
-          <>
-            <FileUpload />
-            <FileList />
-          </>
+          <div className="space-y-6">
+            {/* Title */}
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-semibold text-gray-900">
+                {selectedPage === 'documents' ? 'RAG Documents' : 'ServiceNow Settings'}
+              </h1>
+            </div>
+            
+            {/* File Upload */}
+            <div className="bg-white rounded-lg shadow-sm">
+              <FileUpload 
+                onUpload={(newDoc) => setDocuments(prev => [...prev, newDoc])} 
+              />
+            </div>
+
+            {/* File List */}
+            <div className="bg-white rounded-lg shadow-sm">
+              <FileList 
+                documents={documents} 
+                onDelete={handleDelete}
+              />
+            </div>
+          </div>
         );
       case 'settings':
-        return <UserSettings />;
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-semibold text-gray-900">ServiceNow Settings</h1>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm">
+              <UserSettings />
+            </div>
+          </div>
+        );
       default:
         return null;
     }
   };
 
   return (
-    <div className="App">
-      <Sidebar onSelect={setSelectedPage} />
-      <div className="content">
-        {renderContent()}
+    <div className="flex h-screen bg-gray-50">
+      {/* Side Navigation */}
+      <Sidebar 
+        selectedPage={selectedPage} 
+        onSelect={setSelectedPage} 
+      />
+      
+      {/* Dashboard */}
+      <div className="flex-1 overflow-auto p-8">
+        <div className="max-w-7xl mx-auto">
+          {renderContent()}
+        </div>
       </div>
     </div>
   );

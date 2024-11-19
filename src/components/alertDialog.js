@@ -1,94 +1,101 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import '../App.css'; // 更新为相对于src目录的正确路径
+import React from 'react';
+import * as AlertDialogPrimitive from '@radix-ui/react-alert-dialog';
 
-function AlertDialog({ children }) {
-  return <div className="alert-dialog">{children}</div>;
-}
+const AlertDialog = AlertDialogPrimitive.Root;
 
-export function AlertDialogTrigger({ asChild, children }) {
-  const [open, setOpen] = useState(false);
+const AlertDialogTrigger = AlertDialogPrimitive.Trigger;
 
-  const handleClick = () => {
-    setOpen(true);
-  };
+const AlertDialogPortal = AlertDialogPrimitive.Portal;
 
-  return React.cloneElement(children, { onClick: handleClick });
-}
+const AlertDialogOverlay = React.forwardRef(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Overlay
+    className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+    {...props}
+    ref={ref}
+  />
+));
+AlertDialogOverlay.displayName = "AlertDialogOverlay";
 
-export function AlertDialogContent({ children }) {
-  return <div className="alert-dialog-content">{children}</div>;
-}
+const AlertDialogContent = React.forwardRef(({ className, ...props }, ref) => (
+  <AlertDialogPortal>
+    <AlertDialogOverlay />
+    <AlertDialogPrimitive.Content
+      ref={ref}
+      className="fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] rounded-lg bg-white p-6 shadow-lg"
+      {...props}
+    />
+  </AlertDialogPortal>
+));
+AlertDialogContent.displayName = "AlertDialogContent";
 
-export function AlertDialogHeader({ children }) {
-  return <div className="alert-dialog-header">{children}</div>;
-}
+const AlertDialogHeader = ({
+  className,
+  ...props
+}) => (
+  <div
+    className="flex flex-col space-y-2 text-center sm:text-left"
+    {...props}
+  />
+);
+AlertDialogHeader.displayName = "AlertDialogHeader";
 
-export function AlertDialogTitle({ children }) {
-  return <h2 className="alert-dialog-title">{children}</h2>;
-}
+const AlertDialogFooter = ({
+  className,
+  ...props
+}) => (
+  <div
+    className="flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2"
+    {...props}
+  />
+);
+AlertDialogFooter.displayName = "AlertDialogFooter";
 
-export function AlertDialogDescription({ children }) {
-  return <p className="alert-dialog-description">{children}</p>;
-}
+const AlertDialogTitle = React.forwardRef(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Title
+    ref={ref}
+    className="text-lg font-semibold"
+    {...props}
+  />
+));
+AlertDialogTitle.displayName = "AlertDialogTitle";
 
-export function AlertDialogFooter({ children }) {
-  return <div className="alert-dialog-footer">{children}</div>;
-}
+const AlertDialogDescription = React.forwardRef(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Description
+    ref={ref}
+    className="text-sm text-gray-500"
+    {...props}
+  />
+));
+AlertDialogDescription.displayName = "AlertDialogDescription";
 
-export function AlertDialogCancel({ children, onClick }) {
-  return (
-    <button className="alert-dialog-cancel" onClick={onClick}>
-      {children}
-    </button>
-  );
-}
+const AlertDialogAction = React.forwardRef(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Action
+    ref={ref}
+    className="inline-flex h-10 items-center justify-center rounded-md bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-700"
+    {...props}
+  />
+));
+AlertDialogAction.displayName = "AlertDialogAction";
 
-export function AlertDialogAction({ children, onClick }) {
-  return (
-    <button className="alert-dialog-action" onClick={onClick}>
-      {children}
-    </button>
-  );
-}
+const AlertDialogCancel = React.forwardRef(({ className, ...props }, ref) => (
+  <AlertDialogPrimitive.Cancel
+    ref={ref}
+    className="inline-flex h-10 items-center justify-center rounded-md border border-gray-200 bg-white px-4 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-50"
+    {...props}
+  />
+));
+AlertDialogCancel.displayName = "AlertDialogCancel";
 
-AlertDialog.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
-AlertDialogTrigger.propTypes = {
-  asChild: PropTypes.bool,
-  children: PropTypes.node.isRequired,
-};
-
-AlertDialogContent.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
-AlertDialogHeader.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
-AlertDialogTitle.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
-AlertDialogDescription.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
-AlertDialogFooter.propTypes = {
-  children: PropTypes.node.isRequired,
-};
-
-AlertDialogCancel.propTypes = {
-  children: PropTypes.node.isRequired,
-  onClick: PropTypes.func.isRequired,
-};
-
-AlertDialogAction.propTypes = {
-  children: PropTypes.node.isRequired,
-  onClick: PropTypes.func.isRequired,
+export {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogFooter,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogAction,
+  AlertDialogCancel,
 };
 
 export default AlertDialog;
