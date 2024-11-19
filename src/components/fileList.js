@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Eye, Trash2, FileText } from 'react-feather';
+import { FileText, Trash2 } from 'react-feather';
 import Button from './button';
 import {
   AlertDialog,
@@ -13,7 +13,7 @@ import {
   AlertDialogAction,
 } from './alertDialog';
 
-function FileList({ documents = [] }) {
+function FileList({ documents = [], onDelete }) {
   const [previewDoc, setPreviewDoc] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteDocumentId, setDeleteDocumentId] = useState(null);
@@ -22,8 +22,30 @@ function FileList({ documents = [] }) {
     setPreviewDoc(doc);
   };
 
-  const handleDelete = (id) => {
-    // Logic for file delete
+  const openDeleteDialog = (id) => {
+    setDeleteDocumentId(id);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async (id) => {
+    try {
+      // TODO: Add backend API
+      // await deleteDocument(id);
+      
+      onDelete(id);
+
+      // Close dialog
+      setIsDeleteDialogOpen(false);
+      setDeleteDocumentId(null);
+    } catch (error) {
+      console.error('Delete error:', error);
+      // TODO: Add UI for Error Message
+      alert('Failed to delete document. Please try again.');
+    }
+  };
+
+  // Cancel delete
+  const handleDeleteCancel = () => {
     setIsDeleteDialogOpen(false);
     setDeleteDocumentId(null);
   };
@@ -52,10 +74,9 @@ function FileList({ documents = [] }) {
         {/* Table Header */}
         <div className="bg-gray-50 border-b border-gray-200">
           <div className="grid grid-cols-5 gap-4 px-6 py-3">
-            <div className="text-xs font-medium text-gray-500 uppercase">File Name</div>
+            <div className="text-xs font-medium text-gray-500 uppercase col-span-2">File Name</div>
             <div className="text-xs font-medium text-gray-500 uppercase">File Type</div>
             <div className="text-xs font-medium text-gray-500 uppercase">Status</div>
-            <div className="text-xs font-medium text-gray-500 uppercase">Uploaded Date</div>
             <div className="text-xs font-medium text-gray-500 uppercase">Actions</div>
           </div>
         </div>
@@ -64,12 +85,16 @@ function FileList({ documents = [] }) {
         <div className="divide-y divide-gray-200">
           {documents.map((doc) => (
             <div key={doc.id} className="grid grid-cols-5 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors">
-              <div className="flex items-center space-x-3">
-                <FileText className="flex-shrink-0 h-5 w-5 text-gray-400" />
-                <span className="text-sm text-gray-900 font-medium truncate cursor-pointer hover:text-blue-600"
-                      onClick={() => handlePreview(doc)}>
-                  {doc.name}
-                </span>
+              <div className="col-span-2">
+                <button 
+                  onClick={() => handlePreview(doc)}
+                  className="flex items-center space-x-3 hover:text-blue-600 transition-colors"
+                >
+                  <FileText className="flex-shrink-0 h-5 w-5 text-gray-400" />
+                  <span className="text-sm font-medium truncate">
+                    {doc.name}
+                  </span>
+                </button>
               </div>
               <div className="text-sm text-gray-500">{doc.type}</div>
               <div>
@@ -78,22 +103,19 @@ function FileList({ documents = [] }) {
                   {doc.status}
                 </span>
               </div>
-              <div className="text-sm text-gray-500">{doc.created}</div>
-              <div className="flex items-center space-x-3">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="text-gray-400 hover:text-blue-600"
-                  onClick={() => handlePreview(doc)}
+              <div className="flex items-center">
+                <AlertDialog 
+                  open={isDeleteDialogOpen && deleteDocumentId === doc.id}
+                  onOpenChange={(open) => {
+                    if (!open) handleDeleteCancel();
+                  }}
                 >
-                  <Eye className="h-4 w-4" />
-                </Button>
-                <AlertDialog open={isDeleteDialogOpen && deleteDocumentId === doc.id}>
                   <AlertDialogTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
                       className="text-gray-400 hover:text-red-600"
+                      onClick={() => openDeleteDialog(doc.id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -102,14 +124,17 @@ function FileList({ documents = [] }) {
                     <AlertDialogHeader>
                       <AlertDialogTitle>Delete Document</AlertDialogTitle>
                       <AlertDialogDescription>
-                        Are you sure you want to delete this document? This action cannot be undone.
+                        Are you sure you want to delete "{doc.name}"? This action cannot be undone.
                       </AlertDialogDescription>
                     </AlertDialogHeader>
                     <AlertDialogFooter>
-                      <AlertDialogCancel onClick={() => setIsDeleteDialogOpen(false)}>
+                      <AlertDialogCancel onClick={handleDeleteCancel}>
                         Cancel
                       </AlertDialogCancel>
-                      <AlertDialogAction onClick={() => handleDelete(doc.id)}>
+                      <AlertDialogAction
+                        onClick={() => handleDeleteConfirm(doc.id)}
+                        className="bg-red-600 hover:bg-red-700"
+                      >
                         Delete
                       </AlertDialogAction>
                     </AlertDialogFooter>

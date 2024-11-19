@@ -19,8 +19,23 @@ function App() {
     }
   ]);
 
-  const handleDelete = (id) => {
-    setDocuments(prevDocs => prevDocs.filter(doc => doc.id !== id));
+  const handleFileUpload = (newFile) => {
+    setDocuments(prev => [...prev, newFile]);
+    // TODO: Add backend API integration
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      // TODO: Add backend API
+      // await deleteDocumentFromServer(id);
+      
+      // Update local statement
+      setDocuments(prevDocs => prevDocs.filter(doc => doc.id !== id));
+    } catch (error) {
+      console.error('Delete error:', error);
+      // TODO: Add UI for Error Message
+      alert('Failed to delete document. Please try again.');
+    }
   };
 
   const renderContent = () => {
@@ -38,7 +53,7 @@ function App() {
             {/* File Upload */}
             <div className="bg-white rounded-lg shadow-sm">
               <FileUpload 
-                onUpload={(newDoc) => setDocuments(prev => [...prev, newDoc])} 
+                onUpload={handleFileUpload}  
               />
             </div>
 
