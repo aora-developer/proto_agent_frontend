@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
-import UserSettings from './components/UserSettings';
 import DocumentsPage from './pages/DocumentsPage';
+import AccessControlPage from './pages/AccessControlPage';
+import SyncDataPage from './pages/SyncDataPage';
+import UserSettings from './components/UserSettings';
 import './App.css';
 
 function App() {
@@ -11,6 +13,10 @@ function App() {
     switch (selectedPage) {
       case 'documents':
         return <DocumentsPage />;
+      case 'access-control':
+        return <AccessControlPage />;
+      case 'sync-data':
+        return <SyncDataPage />;
       case 'settings':
         return (
           <div className="space-y-6">
