@@ -1,3 +1,33 @@
+# Project Structure
+project/
+├── public/
+│   ├── favicon.ico
+│   ├── index.html
+│   ├── manifest.json
+├── src/
+│   ├── components/
+│   │   ├── AlertDialog.js
+│   │   ├── Button.js
+│   │   ├── FileList.js
+│   │   ├── FileUpload.js
+│   │   ├── Sidebar.js
+│   │   └── UserSettings.js
+│   ├── pages/
+│   │   ├── AccessControlPage.jsx
+│   │   ├── DocumentsPage.jsx
+│   │   └── SyncDataPage.jsx
+│   ├── App.css
+│   ├── App.js
+│   ├── App.test.js
+│   ├── index.css
+│   └── index.js
+├── .gitignore
+├── package-lock.json
+├── package.json
+├── postcss.config.js
+├── README.md
+└── tailwind.config.js
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
