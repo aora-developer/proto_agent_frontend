@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FileText, Trash2 } from 'react-feather';
-import Button from './button';
+import Button from './Button';
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -11,7 +11,7 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-} from './alertDialog';
+} from './AlertDialog';
 
 function FileList({ documents = [], onDelete }) {
   const [previewDoc, setPreviewDoc] = useState(null);

@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { Upload } from 'react-feather';
-import Button from './button';
+import Button from './Button';
 
 function FileUpload({ onUpload }) {
   const [isDragging, setIsDragging] = useState(false);

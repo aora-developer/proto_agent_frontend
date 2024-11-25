@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import Sidebar from './components/sidebar';
-import FileUpload from './components/fileUpload';
-import FileList from './components/fileList';
-import UserSettings from './components/userSettings';
+import Sidebar from './components/Sidebar';
+import FileUpload from './components/FileUpload';
+import FileList from './components/FileList';
+import UserSettings from './components/UserSettings';
 import './App.css';
 
 function App() {
