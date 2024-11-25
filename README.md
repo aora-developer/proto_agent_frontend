@@ -1,4 +1,5 @@
 # Project Structure
+<pre>
 project/
 ├── public/
 │   ├── favicon.ico
@@ -27,6 +28,7 @@ project/
 ├── postcss.config.js
 ├── README.md
 └── tailwind.config.js
+</pre>
 
 # Getting Started with Create React App
 
