@@ -1,71 +1,16 @@
 import React, { useState } from 'react';
 import Sidebar from './components/Sidebar';
-import FileUpload from './components/FileUpload';
-import FileList from './components/FileList';
 import UserSettings from './components/UserSettings';
+import DocumentsPage from './pages/DocumentsPage';
 import './App.css';
 
 function App() {
   const [selectedPage, setSelectedPage] = useState('documents');
 
-  const [documents, setDocuments] = useState([
-    {
-      id: 1,
-      name: 'Sample Document',
-      type: 'PDF',
-      status: 'Active',
-      created: '2024-02-19',
-      content: 'Sample content'
-    }
-  ]);
-
-  const handleFileUpload = (newFile) => {
-    setDocuments(prev => [...prev, newFile]);
-    // TODO: Add backend API integration
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      // TODO: Add backend API
-      // await deleteDocumentFromServer(id);
-      
-      // Update local statement
-      setDocuments(prevDocs => prevDocs.filter(doc => doc.id !== id));
-    } catch (error) {
-      console.error('Delete error:', error);
-      // TODO: Add UI for Error Message
-      alert('Failed to delete document. Please try again.');
-    }
-  };
-
   const renderContent = () => {
     switch (selectedPage) {
       case 'documents':
-        return (
-          <div className="space-y-6">
-            {/* Title */}
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-semibold text-gray-900">
-                {selectedPage === 'documents' ? 'RAG Documents' : 'ServiceNow Settings'}
-              </h1>
-            </div>
-            
-            {/* File Upload */}
-            <div className="bg-white rounded-lg shadow-sm">
-              <FileUpload 
-                onUpload={handleFileUpload}  
-              />
-            </div>
-
-            {/* File List */}
-            <div className="bg-white rounded-lg shadow-sm">
-              <FileList 
-                documents={documents} 
-                onDelete={handleDelete}
-              />
-            </div>
-          </div>
-        );
+        return <DocumentsPage />;
       case 'settings':
         return (
           <div className="space-y-6">
