@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Save, Key, Globe, User, Edit2, X } from 'react-feather';
+import { Save, Key, Globe, User, Edit2, X, Trash2 } from 'react-feather';
 import Button from './Button';
 import {
   AlertDialog,
@@ -52,7 +52,8 @@ function UserSettings() {
     isOpen: false,
     action: null,
     title: '',
-    description: ''
+    description: '',
+    credentialId: null
   });
 
   // Open the edition dialog
@@ -65,6 +66,16 @@ function UserSettings() {
         username: credential.username,
         password: '', // Reset PW
       }
+    });
+  };
+
+  const handleDelete = (credential) => {
+    setConfirmDialog({
+      isOpen: true,
+      action: 'delete',
+      title: 'Delete Credential',
+      description: `Are you sure you want to delete the credential for ${credential.username}? This action cannot be undone.`,
+      credentialId: credential.id
     });
   };
 
@@ -129,7 +140,7 @@ function UserSettings() {
     });
   };
 
-  // Confirm saving
+  // Confirm action (save or delete)
   const handleConfirmAction = () => {
     if (confirmDialog.action === 'save-edit') {
       // Update credential
@@ -142,8 +153,11 @@ function UserSettings() {
             }
           : cred
       ));
+    } else if (confirmDialog.action === 'delete') {
+      // Delete credential
+      setCredentials(prev => prev.filter(cred => cred.id !== confirmDialog.credentialId));
     }
-    // Clear stamtement
+    // Clear dialogs
     handleCloseDialogs();
   };
 
@@ -162,7 +176,8 @@ function UserSettings() {
       isOpen: false,
       action: null,
       title: '',
-      description: ''
+      description: '',
+      credentialId: null
     });
   };
 
@@ -286,6 +301,14 @@ function UserSettings() {
                   >
                     <Edit2 className="h-4 w-4" />
                   </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDelete(cred)}
+                    className="text-gray-400 hover:text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             ))}
@@ -308,10 +331,9 @@ function UserSettings() {
           <Button
             variant="ghost"
             size="icon"
-            onClick={handleCloseDialogs}
-            className="text-gray-400 hover:text-gray-500"
+            onClick={() => handleEdit(editDialog.credential)}
+            className="text-gray-400 hover:text-blue-600"
           >
-            <X className="h-5 w-5" />
           </Button>
         </div>
         
