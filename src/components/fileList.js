@@ -44,10 +44,23 @@ function FileList({ documents = [], onDelete }) {
     }
   };
 
-  // Cancel delete
   const handleDeleteCancel = () => {
     setIsDeleteDialogOpen(false);
     setDeleteDocumentId(null);
+  };
+
+  // Format date helper function
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleString('ja-JP', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false
+    }).replace(/\//g, '-');
   };
 
   if (documents.length === 0) {
@@ -73,10 +86,11 @@ function FileList({ documents = [], onDelete }) {
       <div className="min-w-full">
         {/* Table Header */}
         <div className="bg-gray-50 border-b border-gray-200">
-          <div className="grid grid-cols-5 gap-4 px-6 py-3">
+          <div className="grid grid-cols-6 gap-4 px-6 py-3">
             <div className="text-xs font-medium text-gray-500 uppercase col-span-2">File Name</div>
             <div className="text-xs font-medium text-gray-500 uppercase">File Type</div>
             <div className="text-xs font-medium text-gray-500 uppercase">Status</div>
+            <div className="text-xs font-medium text-gray-500 uppercase">Upload Date</div>
             <div className="text-xs font-medium text-gray-500 uppercase">Actions</div>
           </div>
         </div>
@@ -84,7 +98,7 @@ function FileList({ documents = [], onDelete }) {
         {/* Table Body */}
         <div className="divide-y divide-gray-200">
           {documents.map((doc) => (
-            <div key={doc.id} className="grid grid-cols-5 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors">
+            <div key={doc.id} className="grid grid-cols-6 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors">
               <div className="col-span-2">
                 <button 
                   onClick={() => handlePreview(doc)}
@@ -102,6 +116,9 @@ function FileList({ documents = [], onDelete }) {
                                bg-green-100 text-green-800">
                   {doc.status}
                 </span>
+              </div>
+              <div className="text-sm text-gray-500">
+                {doc.uploadDate ? formatDate(doc.uploadDate) : '-'}
               </div>
               <div className="flex items-center">
                 <AlertDialog 
