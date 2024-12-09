@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Settings, Shield, Database } from 'react-feather';
+import { FileText, Settings, Shield, Database, Cloud } from 'react-feather';
 
 const Sidebar = ({ selectedPage, onSelect }) => {
   const navItems = [
@@ -22,6 +22,11 @@ const Sidebar = ({ selectedPage, onSelect }) => {
       id: 'settings',
       name: 'ServiceNow Settings',
       icon: Settings
+    },
+    {
+      id: 'azure-settings',
+      name: 'Azure Settings',
+      icon: Cloud
     }
   ];
 

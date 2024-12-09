@@ -4,6 +4,7 @@ import DocumentsPage from './pages/DocumentsPage';
 import AccessControlPage from './pages/AccessControlPage';
 import SyncDataPage from './pages/SyncDataPage';
 import UserSettings from './components/UserSettings';
+import AzureSettings from './components/AzureSettings';
 import './App.css';
 
 function App() {
@@ -25,6 +26,17 @@ function App() {
             </div>
             <div className="bg-white rounded-lg shadow-sm">
               <UserSettings />
+            </div>
+          </div>
+        );
+      case 'azure-settings':
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-semibold text-gray-900">Azure Settings</h1>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm">
+              <AzureSettings />
             </div>
           </div>
         );
