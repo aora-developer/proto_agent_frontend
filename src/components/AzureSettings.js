@@ -1,7 +1,4 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import AlertDialog from './AlertDialog';
 
 const AzureSettings = () => {
@@ -59,86 +56,105 @@ const AzureSettings = () => {
 
   return (
     <div className="p-6">
-      <Card className="mb-6">
-        <CardHeader>
-          <CardTitle>Azure Connection Settings</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">Client ID</label>
-              <Input
-                name="clientId"
-                value={newSetting.clientId}
-                onChange={handleInputChange}
-                className="w-full"
-                placeholder="Enter Client ID"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Client Secret</label>
-              <Input
-                name="clientSecret"
-                type="password"
-                value={newSetting.clientSecret}
-                onChange={handleInputChange}
-                className="w-full"
-                placeholder="Enter Client Secret"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Tenant ID</label>
-              <Input
-                name="tenantId"
-                value={newSetting.tenantId}
-                onChange={handleInputChange}
-                className="w-full"
-                placeholder="Enter Tenant ID"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1">Subscription ID</label>
-              <Input
-                name="subscriptionId"
-                value={newSetting.subscriptionId}
-                onChange={handleInputChange}
-                className="w-full"
-                placeholder="Enter Subscription ID"
-              />
-            </div>
-            <Button onClick={handleSave}>
-              {isEditing ? 'Update Settings' : 'Save Settings'}
-            </Button>
+      {/* Input Form */}
+      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+        <h2 className="text-lg font-semibold mb-4">
+          {isEditing ? 'Edit Azure Connection' : 'New Azure Connection'}
+        </h2>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Client ID
+            </label>
+            <input
+              type="text"
+              name="clientId"
+              value={newSetting.clientId}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter Client ID"
+            />
           </div>
-        </CardContent>
-      </Card>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Client Secret
+            </label>
+            <input
+              type="password"
+              name="clientSecret"
+              value={newSetting.clientSecret}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter Client Secret"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Tenant ID
+            </label>
+            <input
+              type="text"
+              name="tenantId"
+              value={newSetting.tenantId}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter Tenant ID"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Subscription ID
+            </label>
+            <input
+              type="text"
+              name="subscriptionId"
+              value={newSetting.subscriptionId}
+              onChange={handleInputChange}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter Subscription ID"
+            />
+          </div>
+          <button
+            onClick={handleSave}
+            className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            {isEditing ? 'Update Settings' : 'Save Settings'}
+          </button>
+        </div>
+      </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Saved Azure Connections</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {settings.map((setting, index) => (
-              <div key={index} className="flex items-center justify-between p-4 border rounded">
-                <div>
-                  <p className="font-medium">Client ID: {setting.clientId}</p>
-                  <p>Tenant ID: {setting.tenantId}</p>
-                  <p>Subscription ID: {setting.subscriptionId}</p>
-                </div>
-                <div className="space-x-2">
-                  <Button variant="outline" onClick={() => handleEdit(setting)}>
-                    Edit
-                  </Button>
-                  <Button variant="destructive" onClick={() => handleDelete(setting)}>
-                    Delete
-                  </Button>
-                </div>
+      {/* Settings List */}
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <h2 className="text-lg font-semibold mb-4">Saved Azure Connections</h2>
+        <div className="space-y-4">
+          {settings.map((setting, index) => (
+            <div 
+              key={index} 
+              className="p-4 border border-gray-200 rounded-lg flex items-center justify-between"
+            >
+              <div>
+                <p className="font-medium">Client ID: {setting.clientId}</p>
+                <p className="text-gray-600">Tenant ID: {setting.tenantId}</p>
+                <p className="text-gray-600">Subscription ID: {setting.subscriptionId}</p>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              <div className="space-x-2">
+                <button
+                  onClick={() => handleEdit(setting)}
+                  className="px-3 py-1 text-sm text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(setting)}
+                  className="px-3 py-1 text-sm text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       <AlertDialog
         isOpen={showDeleteDialog}
