@@ -1,170 +1,444 @@
 import React, { useState } from 'react';
-import AlertDialog from './AlertDialog';
+import { Save, Cloud, Key, Database, Edit2, Trash2 } from 'react-feather';
+import Button from './Button';
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from './AlertDialog';
 
-const AzureSettings = () => {
-  const [settings, setSettings] = useState([]);
-  const [newSetting, setNewSetting] = useState({
+function AzureSettings() {
+  const [newSettings, setNewSettings] = useState({
     clientId: '',
     clientSecret: '',
     tenantId: '',
     subscriptionId: ''
   });
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [selectedSetting, setSelectedSetting] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
+
+  const [credentials, setCredentials] = useState([
+    {
+      id: 1,
+      clientId: '8a4b9c3d2e1f',
+      clientSecret: '********',
+      tenantId: 'tenant123456',
+      subscriptionId: 'sub789012'
+    },
+    {
+      id: 2,
+      clientId: '7b5a4c8d9e2f',
+      clientSecret: '********',
+      tenantId: 'tenant789012',
+      subscriptionId: 'sub345678'
+    }
+  ]);
+
+  const [editDialog, setEditDialog] = useState({
+    isOpen: false,
+    credential: null,
+    formData: {
+      clientId: '',
+      clientSecret: '',
+      tenantId: '',
+      subscriptionId: ''
+    }
+  });
+
+  const [confirmDialog, setConfirmDialog] = useState({
+    isOpen: false,
+    action: null,
+    title: '',
+    description: '',
+    credentialId: null
+  });
+
+  const handleEdit = (credential) => {
+    setEditDialog({
+      isOpen: true,
+      credential,
+      formData: {
+        clientId: credential.clientId,
+        clientSecret: '',
+        tenantId: credential.tenantId,
+        subscriptionId: credential.subscriptionId
+      }
+    });
+  };
+
+  const handleDelete = (credential) => {
+    setConfirmDialog({
+      isOpen: true,
+      action: 'delete',
+      title: 'Delete Credential',
+      description: `Are you sure you want to delete this Azure credential? This action cannot be undone.`,
+      credentialId: credential.id
+    });
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setNewSetting(prev => ({
+    setNewSettings(prev => ({
       ...prev,
       [name]: value
     }));
   };
 
-  const handleSave = () => {
-    if (isEditing) {
-      setSettings(settings.map(setting => 
-        setting === selectedSetting ? newSetting : setting
-      ));
-      setIsEditing(false);
-    } else {
-      setSettings([...settings, newSetting]);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const newCredential = {
+        id: Date.now(),
+        ...newSettings,
+        clientSecret: '********'
+      };
+      
+      setCredentials(prev => [...prev, newCredential]);
+      setNewSettings({
+        clientId: '',
+        clientSecret: '',
+        tenantId: '',
+        subscriptionId: ''
+      });
+      
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      alert('Failed to save settings. Please try again.');
     }
-    setNewSetting({
-      clientId: '',
-      clientSecret: '',
-      tenantId: '',
-      subscriptionId: ''
+  };
+
+  const handleEditFormChange = (e) => {
+    const { name, value } = e.target;
+    setEditDialog(prev => ({
+      ...prev,
+      formData: {
+        ...prev.formData,
+        [name]: value
+      }
+    }));
+  };
+
+  const handleSaveEdit = () => {
+    setConfirmDialog({
+      isOpen: true,
+      action: 'save-edit',
+      title: 'Confirm Changes',
+      description: 'Are you sure you want to save these changes to the Azure credential? This action will update the stored information.'
     });
   };
 
-  const handleEdit = (setting) => {
-    setNewSetting(setting);
-    setSelectedSetting(setting);
-    setIsEditing(true);
+  const handleConfirmAction = () => {
+    if (confirmDialog.action === 'save-edit') {
+      setCredentials(prev => prev.map(cred => 
+        cred.id === editDialog.credential.id
+          ? { 
+              ...cred, 
+              ...editDialog.formData,
+              clientSecret: editDialog.formData.clientSecret ? '********' : cred.clientSecret 
+            }
+          : cred
+      ));
+    } else if (confirmDialog.action === 'delete') {
+      setCredentials(prev => prev.filter(cred => cred.id !== confirmDialog.credentialId));
+    }
+    handleCloseDialogs();
   };
 
-  const handleDelete = (setting) => {
-    setSelectedSetting(setting);
-    setShowDeleteDialog(true);
-  };
-
-  const confirmDelete = () => {
-    setSettings(settings.filter(setting => setting !== selectedSetting));
-    setShowDeleteDialog(false);
+  const handleCloseDialogs = () => {
+    setEditDialog({
+      isOpen: false,
+      credential: null,
+      formData: {
+        clientId: '',
+        clientSecret: '',
+        tenantId: '',
+        subscriptionId: ''
+      }
+    });
+    setConfirmDialog({
+      isOpen: false,
+      action: null,
+      title: '',
+      description: '',
+      credentialId: null
+    });
   };
 
   return (
-    <div className="p-6">
-      {/* Input Form */}
-      <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
-        <h2 className="text-lg font-semibold mb-4">
-          {isEditing ? 'Edit Azure Connection' : 'New Azure Connection'}
-        </h2>
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+    <div className="space-y-6">
+      {/* Azure Configuration */}
+      <div className="bg-white rounded-lg shadow">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">Azure Configuration</h2>
+        </div>
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+          {/* Client ID Input */}
+          <div className="space-y-2">
+            <label htmlFor="clientId" className="block text-sm font-medium text-gray-700">
               Client ID
             </label>
-            <input
-              type="text"
-              name="clientId"
-              value={newSetting.clientId}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter Client ID"
-            />
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Cloud className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                id="clientId"
+                name="clientId"
+                value={newSettings.clientId}
+                onChange={handleInputChange}
+                className="block w-full pl-10 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter Client ID"
+                required
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+
+          {/* Client Secret Input */}
+          <div className="space-y-2">
+            <label htmlFor="clientSecret" className="block text-sm font-medium text-gray-700">
               Client Secret
             </label>
-            <input
-              type="password"
-              name="clientSecret"
-              value={newSetting.clientSecret}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter Client Secret"
-            />
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Key className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="password"
+                id="clientSecret"
+                name="clientSecret"
+                value={newSettings.clientSecret}
+                onChange={handleInputChange}
+                className="block w-full pl-10 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter Client Secret"
+                required
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+
+          {/* Tenant ID Input */}
+          <div className="space-y-2">
+            <label htmlFor="tenantId" className="block text-sm font-medium text-gray-700">
               Tenant ID
             </label>
-            <input
-              type="text"
-              name="tenantId"
-              value={newSetting.tenantId}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter Tenant ID"
-            />
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Database className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                id="tenantId"
+                name="tenantId"
+                value={newSettings.tenantId}
+                onChange={handleInputChange}
+                className="block w-full pl-10 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter Tenant ID"
+                required
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+
+          {/* Subscription ID Input */}
+          <div className="space-y-2">
+            <label htmlFor="subscriptionId" className="block text-sm font-medium text-gray-700">
               Subscription ID
             </label>
-            <input
-              type="text"
-              name="subscriptionId"
-              value={newSetting.subscriptionId}
-              onChange={handleInputChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Enter Subscription ID"
-            />
-          </div>
-          <button
-            onClick={handleSave}
-            className="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-          >
-            {isEditing ? 'Update Settings' : 'Save Settings'}
-          </button>
-        </div>
-      </div>
-
-      {/* Settings List */}
-      <div className="bg-white rounded-lg shadow-sm p-6">
-        <h2 className="text-lg font-semibold mb-4">Saved Azure Connections</h2>
-        <div className="space-y-4">
-          {settings.map((setting, index) => (
-            <div 
-              key={index} 
-              className="p-4 border border-gray-200 rounded-lg flex items-center justify-between"
-            >
-              <div>
-                <p className="font-medium">Client ID: {setting.clientId}</p>
-                <p className="text-gray-600">Tenant ID: {setting.tenantId}</p>
-                <p className="text-gray-600">Subscription ID: {setting.subscriptionId}</p>
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Database className="h-5 w-5 text-gray-400" />
               </div>
-              <div className="space-x-2">
-                <button
-                  onClick={() => handleEdit(setting)}
-                  className="px-3 py-1 text-sm text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => handleDelete(setting)}
-                  className="px-3 py-1 text-sm text-white bg-red-600 rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                >
-                  Delete
-                </button>
-              </div>
+              <input
+                type="text"
+                id="subscriptionId"
+                name="subscriptionId"
+                value={newSettings.subscriptionId}
+                onChange={handleInputChange}
+                className="block w-full pl-10 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter Subscription ID"
+                required
+              />
             </div>
-          ))}
+          </div>
+
+          {/* Save */}
+          <div className="flex justify-end">
+            <Button
+              type="submit"
+              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white"
+            >
+              <Save className="h-4 w-4 mr-2" />
+              Save Settings
+            </Button>
+          </div>
+        </form>
+      </div>
+
+      {/* Credentials Management */}
+      <div className="bg-white rounded-lg shadow">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">Credentials Management</h2>
+        </div>
+        
+        <div className="min-w-full">
+          {/* Table Header */}
+          <div className="bg-gray-50 border-b border-gray-200">
+            <div className="grid grid-cols-5 gap-4 px-6 py-3">
+              <div className="text-xs font-medium text-gray-500 uppercase">Client ID</div>
+              <div className="text-xs font-medium text-gray-500 uppercase">Client Secret</div>
+              <div className="text-xs font-medium text-gray-500 uppercase">Tenant ID</div>
+              <div className="text-xs font-medium text-gray-500 uppercase">Subscription ID</div>
+              <div className="text-xs font-medium text-gray-500 uppercase">Actions</div>
+            </div>
+          </div>
+
+          {/* Table Body */}
+          <div className="divide-y divide-gray-200">
+            {credentials.map((cred) => (
+              <div key={cred.id} className="grid grid-cols-5 gap-4 px-6 py-4 hover:bg-gray-50">
+                <div className="text-sm text-gray-900">{cred.clientId}</div>
+                <div className="text-sm text-gray-900">{cred.clientSecret}</div>
+                <div className="text-sm text-gray-900">{cred.tenantId}</div>
+                <div className="text-sm text-gray-900">{cred.subscriptionId}</div>
+                <div className="flex items-center">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleEdit(cred)}
+                    className="text-gray-400 hover:text-blue-600"
+                  >
+                    <Edit2 className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => handleDelete(cred)}
+                    className="text-gray-400 hover:text-red-600"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
-      <AlertDialog
-        isOpen={showDeleteDialog}
-        onClose={() => setShowDeleteDialog(false)}
-        onConfirm={confirmDelete}
-        title="Delete Azure Connection"
-        message="Are you sure you want to delete this Azure connection? This action cannot be undone."
-      />
-    </div>
-  );
-};
+      {/* Edit Dialog */}
+      <AlertDialog 
+        open={editDialog.isOpen}
+        onOpenChange={(isOpen) => {
+          if (!isOpen) handleCloseDialogs();
+        }}
+      >
+        <AlertDialogContent className="sm:max-w-md">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900">
+              Edit Azure Credential
+            </h3>
+          </div>
+          
+          <div className="p-6 space-y-4">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Client ID
+              </label>
+              <input
+                type="text"
+                name="clientId"
+                value={editDialog.formData.clientId}
+                onChange={handleEditFormChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                New Client Secret
+              </label>
+              <input
+                type="password"
+                name="clientSecret"
+                value={editDialog.formData.clientSecret}
+                onChange={handleEditFormChange}
+                placeholder="Leave blank to keep current secret"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Tenant ID
+              </label>
+              <input
+                type="text"
+                name="tenantId"
+                value={editDialog.formData.tenantId}
+                onChange={handleEditFormChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Subscription ID
+              </label>
+              <input
+                type="text"
+                name="subscriptionId"
+                value={editDialog.formData.subscriptionId}
+                onChange={handleEditFormChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          <div className="flex justify-end px-6 py-4 border-t border-gray-200 gap-3">
+            <Button
+              variant="ghost"
+              onClick={handleCloseDialogs}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSaveEdit}
+            >
+              Save Changes
+            </Button>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Confirm Dialog */}
+    <AlertDialog 
+      open={confirmDialog.isOpen}
+      onOpenChange={(isOpen) => {
+        if (!isOpen) setConfirmDialog(prev => ({ ...prev, isOpen: false }));
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{confirmDialog.title}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {confirmDialog.description}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={handleCloseDialogs}>
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction onClick={handleConfirmAction}>
+            Save Changes
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  </div>
+);
+
+}
 
 export default AzureSettings;

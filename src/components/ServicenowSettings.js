@@ -13,7 +13,7 @@ import {
   AlertDialogAction,
 } from './AlertDialog';
 
-function UserSettings() {
+function ServicenowSettings() {
   // Create new setting statement
   const [newSettings, setNewSettings] = useState({
     instanceUrl: '',
@@ -424,4 +424,4 @@ function UserSettings() {
 
 }
 
-export default UserSettings;
+export default ServicenowSettings;

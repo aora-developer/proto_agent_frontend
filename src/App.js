@@ -3,8 +3,9 @@ import Sidebar from './components/Sidebar';
 import DocumentsPage from './pages/DocumentsPage';
 import AccessControlPage from './pages/AccessControlPage';
 import SyncDataPage from './pages/SyncDataPage';
-import UserSettings from './components/UserSettings';
+import ServicenowSettings from './components/ServicenowSettings';
 import AzureSettings from './components/AzureSettings';
+import SlackSettings from './components/SlackSettings';
 import './App.css';
 
 function App() {
@@ -25,7 +26,7 @@ function App() {
               <h1 className="text-2xl font-semibold text-gray-900">ServiceNow Settings</h1>
             </div>
             <div className="bg-white rounded-lg shadow-sm">
-              <UserSettings />
+              <ServicenowSettings />
             </div>
           </div>
         );
@@ -37,6 +38,17 @@ function App() {
             </div>
             <div className="bg-white rounded-lg shadow-sm">
               <AzureSettings />
+            </div>
+          </div>
+        );
+      case 'slack-settings':
+        return (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-semibold text-gray-900">Slack Settings</h1>
+            </div>
+            <div className="bg-white rounded-lg shadow-sm">
+              <SlackSettings />
             </div>
           </div>
         );

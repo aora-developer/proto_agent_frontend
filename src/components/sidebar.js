@@ -1,5 +1,5 @@
 import React from 'react';
-import { FileText, Settings, Shield, Database, Cloud } from 'react-feather';
+import { FileText, Settings, Shield, Database, Cloud, MessageCircle } from 'react-feather';
 
 const Sidebar = ({ selectedPage, onSelect }) => {
   const navItems = [
@@ -27,6 +27,11 @@ const Sidebar = ({ selectedPage, onSelect }) => {
       id: 'azure-settings',
       name: 'Azure Settings',
       icon: Cloud
+    },
+    {
+      id: 'slack-settings',
+      name: 'Slack Settings',
+      icon: MessageCircle
     }
   ];
 
