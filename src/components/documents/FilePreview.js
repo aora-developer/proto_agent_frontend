@@ -6,10 +6,10 @@ import Button from '@/components/ui/Button';
 const FilePreview = ({ document, onClose }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [iframeKey, setIframeKey] = useState(0); 
+  const [iframeKey, setIframeKey] = useState(0);
 
   useEffect(() => {
-    // reset statement
+    // reset state when document URL changes
     setIsLoading(true);
     setError(null);
     setIframeKey(prev => prev + 1);
@@ -93,7 +93,7 @@ const FilePreview = ({ document, onClose }) => {
               title={`Preview of ${document.name || 'document'}`}
               onLoad={handleIframeLoad}
               onError={handleIframeError}
-              style={{ minHeight: '600px', minWidth: '900px' }} 
+              style={{ minHeight: '600px', minWidth: '900px' }}
             />
           )}
         </div>

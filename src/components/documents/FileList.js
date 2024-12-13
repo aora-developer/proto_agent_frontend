@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Trash2 } from 'react-feather';
+import { FileText, Trash2 } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import {
   AlertDialog,
@@ -13,39 +13,29 @@ import {
   AlertDialogAction,
 } from '@/components/ui/AlertDialog';
 import FilePreview from './FilePreview';
-import config from '../../config';
 
 function FileList({ documents = [], onDelete }) {
   const [previewDoc, setPreviewDoc] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteDocumentId, setDeleteDocumentId] = useState(null);
 
-  const handlePreview = async (doc) => {
+  const handlePreview = async (document) => {
     try {
-      const response = await fetch(`${config.apiUrl}/api/documents/${doc._id}/content`, {
-        credentials: 'omit',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-  
+      const response = await fetch(`/api/documents/${document._id}/content`);
+      
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
-  
-      const data = await response.json();
-      if (!data.url) {
-        throw new Error('No URL in response');
-      }
-  
+      
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      
       setPreviewDoc({
-        ...doc,
-        url: data.url
+        ...document,
+        url: url
       });
     } catch (error) {
       console.error('Preview error:', error);
-      alert('Failed to load document preview. Please try again.');
     }
   };
 
@@ -123,9 +113,7 @@ function FileList({ documents = [], onDelete }) {
                   className="flex items-center space-x-3 hover:text-blue-600 transition-colors"
                 >
                   <FileText className="flex-shrink-0 h-5 w-5 text-gray-400" />
-                  <span className="text-sm font-medium truncate">
-                    {doc.name}
-                  </span>
+                  <span className="text-sm font-medium truncate">{doc.name}</span>
                 </button>
               </div>
               <div className="text-sm text-gray-500">{doc.type}</div>
@@ -138,7 +126,6 @@ function FileList({ documents = [], onDelete }) {
                 {doc.uploadDate ? formatDate(doc.uploadDate) : '-'}
               </div>
               <div className="flex items-center">
-                {/* ... Delete ... */}
                 <AlertDialog 
                   open={isDeleteDialogOpen && deleteDocumentId === doc._id}
                   onOpenChange={(open) => {
