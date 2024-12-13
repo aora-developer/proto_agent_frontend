@@ -7,7 +7,6 @@ function FileUpload({ onUpload }) {
   const [uploading, setUploading] = useState(false);
   const fileInputRef = useRef(null);
 
-  // Dragging Event
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -19,7 +18,6 @@ function FileUpload({ onUpload }) {
     }
   };
 
-  // File Uploading
   const handleFile = async (files) => {
     if (!files || files.length === 0) return;
 
@@ -36,31 +34,19 @@ function FileUpload({ onUpload }) {
         throw new Error('No valid files selected. Please upload PDF, TXT, or Word documents.');
       }
 
-      // Preview File
-      const filePromises = validFiles.map(async (file) => {
-        // Backend
-        // TODO: Change the logic to real backend API
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Assuming access delay
+      for (const file of validFiles) {
+        const formData = new FormData();
+        formData.append('file', file);
 
-        return {
-          id: Date.now() + Math.random(), // Temporary ID，should be created by backend
-          name: file.name,
-          type: file.type.split('/')[1].toUpperCase(),
-          status: 'Uploaded',
-          created: new Date().toISOString().split('T')[0],
-          size: file.size,
-          content: await file.text() // Should be change to backend process
-        };
-      });
-
-      const uploadedFiles = await Promise.all(filePromises);
-      uploadedFiles.forEach(file => {
-        onUpload(file);
-      });
+        try {
+          onUpload(file);
+        } catch (error) {
+          console.error('Error processing file:', error);
+        }
+      }
 
     } catch (error) {
       console.error('Upload error:', error);
-      // TODO: Add a UI for Error Message
       alert(error.message);
     } finally {
       setUploading(false);
@@ -68,7 +54,6 @@ function FileUpload({ onUpload }) {
     }
   };
 
-  // Processing dragging event
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -78,7 +63,6 @@ function FileUpload({ onUpload }) {
     handleFile(files);
   };
 
-  // Click to Upload
   const handleButtonUpload = () => {
     fileInputRef.current?.click();
   };
