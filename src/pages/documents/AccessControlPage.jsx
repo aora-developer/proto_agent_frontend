@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Shield, UserPlus, Search, Edit2, Save } from 'react-feather';
-import Button from '../components/Button';
+import Button from '@/components/ui/Button';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/Alert";
 import {
   AlertDialog,
+  AlertDialogTrigger,
   AlertDialogContent,
   AlertDialogHeader,
   AlertDialogTitle,
@@ -10,7 +12,7 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-} from '../components/AlertDialog';
+} from '@/components/ui/AlertDialog';
 
 function AccessControlPage() {
   // Access control list

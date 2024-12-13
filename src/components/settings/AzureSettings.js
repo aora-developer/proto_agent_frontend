@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Save, Cloud, Key, Database, Edit2, Trash2 } from 'react-feather';
-import Button from './Button';
+import Button from '@/components/ui/Button';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/Alert";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -11,7 +12,7 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-} from './AlertDialog';
+} from '@/components/ui/AlertDialog';
 
 function AzureSettings() {
   const [newSettings, setNewSettings] = useState({

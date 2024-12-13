@@ -1,11 +1,17 @@
+// Layout components
+import Sidebar from './components/layout/Sidebar';
+
+// Pages
+import DocumentsPage from './pages/documents/DocumentsPage';
+import AccessControlPage from './pages/documents/AccessControlPage';
+import SyncDataPage from './pages/sync/SyncDataPage';
+
+// Settings components
+import ServicenowSettings from './components/settings/ServicenowSettings';
+import AzureSettings from './components/settings/AzureSettings';
+import SlackSettings from './components/settings/SlackSettings';
+
 import React, { useState } from 'react';
-import Sidebar from './components/Sidebar';
-import DocumentsPage from './pages/DocumentsPage';
-import AccessControlPage from './pages/AccessControlPage';
-import SyncDataPage from './pages/SyncDataPage';
-import ServicenowSettings from './components/ServicenowSettings';
-import AzureSettings from './components/AzureSettings';
-import SlackSettings from './components/SlackSettings';
 import './App.css';
 
 function App() {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FileText, Trash2 } from 'react-feather';
-import Button from './Button';
+import Button from '@/components/ui/Button';
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -11,15 +11,42 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-} from './AlertDialog';
+} from '@/components/ui/AlertDialog';
+import FilePreview from './FilePreview';
+import config from '../../config';
 
 function FileList({ documents = [], onDelete }) {
   const [previewDoc, setPreviewDoc] = useState(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [deleteDocumentId, setDeleteDocumentId] = useState(null);
 
-  const handlePreview = (doc) => {
-    setPreviewDoc(doc);
+  const handlePreview = async (doc) => {
+    try {
+      const response = await fetch(`${config.apiUrl}/api/documents/${doc._id}/content`, {
+        credentials: 'omit',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+      if (!data.url) {
+        throw new Error('No URL in response');
+      }
+  
+      setPreviewDoc({
+        ...doc,
+        url: data.url
+      });
+    } catch (error) {
+      console.error('Preview error:', error);
+      alert('Failed to load document preview. Please try again.');
+    }
   };
 
   const openDeleteDialog = (id) => {
@@ -27,19 +54,13 @@ function FileList({ documents = [], onDelete }) {
     setIsDeleteDialogOpen(true);
   };
 
-  const handleDeleteConfirm = async (id) => {
+  const handleDeleteConfirm = async () => {
     try {
-      // TODO: Add backend API
-      // await deleteDocument(id);
-      
-      onDelete(id);
-
-      // Close dialog
+      await onDelete(deleteDocumentId);
       setIsDeleteDialogOpen(false);
       setDeleteDocumentId(null);
     } catch (error) {
       console.error('Delete error:', error);
-      // TODO: Add UI for Error Message
       alert('Failed to delete document. Please try again.');
     }
   };
@@ -49,7 +70,6 @@ function FileList({ documents = [], onDelete }) {
     setDeleteDocumentId(null);
   };
 
-  // Format date helper function
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleString('ja-JP', {
@@ -77,14 +97,12 @@ function FileList({ documents = [], onDelete }) {
 
   return (
     <div className="bg-white rounded-lg border border-gray-200">
-      {/* Header */}
       <div className="px-6 py-4 border-b border-gray-200">
         <h2 className="text-lg font-semibold text-gray-900">Documents List</h2>
       </div>
 
-      {/* Table */}
       <div className="min-w-full">
-        {/* Table Header */}
+        {/* Title */}
         <div className="bg-gray-50 border-b border-gray-200">
           <div className="grid grid-cols-6 gap-4 px-6 py-3">
             <div className="text-xs font-medium text-gray-500 uppercase col-span-2">File Name</div>
@@ -95,10 +113,10 @@ function FileList({ documents = [], onDelete }) {
           </div>
         </div>
 
-        {/* Table Body */}
+        {/* Document List */}
         <div className="divide-y divide-gray-200">
           {documents.map((doc) => (
-            <div key={doc.id} className="grid grid-cols-6 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors">
+            <div key={doc._id} className="grid grid-cols-6 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors">
               <div className="col-span-2">
                 <button 
                   onClick={() => handlePreview(doc)}
@@ -112,8 +130,7 @@ function FileList({ documents = [], onDelete }) {
               </div>
               <div className="text-sm text-gray-500">{doc.type}</div>
               <div>
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                               bg-green-100 text-green-800">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
                   {doc.status}
                 </span>
               </div>
@@ -121,8 +138,9 @@ function FileList({ documents = [], onDelete }) {
                 {doc.uploadDate ? formatDate(doc.uploadDate) : '-'}
               </div>
               <div className="flex items-center">
+                {/* ... Delete ... */}
                 <AlertDialog 
-                  open={isDeleteDialogOpen && deleteDocumentId === doc.id}
+                  open={isDeleteDialogOpen && deleteDocumentId === doc._id}
                   onOpenChange={(open) => {
                     if (!open) handleDeleteCancel();
                   }}
@@ -132,7 +150,7 @@ function FileList({ documents = [], onDelete }) {
                       variant="ghost"
                       size="icon"
                       className="text-gray-400 hover:text-red-600"
-                      onClick={() => openDeleteDialog(doc.id)}
+                      onClick={() => openDeleteDialog(doc._id)}
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
@@ -149,7 +167,7 @@ function FileList({ documents = [], onDelete }) {
                         Cancel
                       </AlertDialogCancel>
                       <AlertDialogAction
-                        onClick={() => handleDeleteConfirm(doc.id)}
+                        onClick={handleDeleteConfirm}
                         className="bg-red-600 hover:bg-red-700"
                       >
                         Delete
@@ -163,40 +181,12 @@ function FileList({ documents = [], onDelete }) {
         </div>
       </div>
 
-      {/* Preview Dialog */}
+      {/* Preview Modal */}
       {previewDoc && (
-        <div className="fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">
-                Preview: {previewDoc.name}
-              </h3>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setPreviewDoc(null)}
-                className="text-gray-400 hover:text-gray-500"
-              >
-                <span className="sr-only">Close</span>
-                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </Button>
-            </div>
-            <div className="mt-2">
-              <p className="text-sm text-gray-500">{previewDoc.content}</p>
-            </div>
-            <div className="mt-6 flex justify-end">
-              <Button
-                variant="ghost"
-                onClick={() => setPreviewDoc(null)}
-                className="text-sm font-medium text-gray-700 hover:text-gray-500"
-              >
-                Close
-              </Button>
-            </div>
-          </div>
-        </div>
+        <FilePreview
+          document={previewDoc}
+          onClose={() => setPreviewDoc(null)}
+        />
       )}
     </div>
   );

@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from "react"; 
-import FileUpload from "../components/FileUpload";
-import FileList from "../components/FileList";
+import FileUpload from "../../components/documents/FileUpload";
+import FileList from "../../components/documents/FileList";
 
 function DocumentsPage() {
   const [documents, setDocuments] = useState([]);
 
   useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        const response = await fetch('http://localhost:3001/api/documents/list');
+        const data = await response.json();
+        console.log('Fetched documents:', data);
+        setDocuments(data);
+      } catch (error) {
+        console.error('Error fetching documents:', error);
+      }
+    };
+  
     fetchDocuments();
   }, []);
-
-  const fetchDocuments = async () => {
-    try {
-      const response = await fetch("http://localhost:3001/api/documents/list");
-      const data = await response.json();
-      setDocuments(data);
-    } catch (error) {
-      console.error("Error fetching documents:", error);
-    }
-  };
 
   const handleFileUpload = async (newFile) => {
     try {

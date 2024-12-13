@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Save, Hash, Key, Briefcase, Edit2, Trash2 } from 'react-feather'; 
-import Button from './Button';
+import { Save, Key, Globe, User, Edit2, X, Trash2 } from 'react-feather';
+import Button from '@/components/ui/Button';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/Alert";
 import {
   AlertDialog,
   AlertDialogTrigger,
@@ -11,82 +12,75 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogAction,
-} from './AlertDialog';
+} from '@/components/ui/AlertDialog';
 
-function SlackSettings() {
-  // New settings state
+function ServicenowSettings() {
+  // Create new setting statement
   const [newSettings, setNewSettings] = useState({
-    botToken: '',
-    appToken: '',
-    channelId: '',
-    workspaceName: '',
+    instanceUrl: '',
+    username: '',
+    password: '',
   });
 
-  // Current settings state
-  const [settings, setSettings] = useState([
+  // Current credential statement
+  const [credentials, setCredentials] = useState([
     {
       id: 1,
-      botToken: "xoxb-sample1",
-      appToken: "xapp-sample1",
-      channelId: "C0123ABC",
-      workspaceName: "Team Workspace",
+      instanceUrl: 'https://dev.service-now.com',
+      username: 'admin.dev',
+      password: '********',
     },
     {
       id: 2,
-      botToken: "xoxb-sample2",
-      appToken: "xapp-sample2",
-      channelId: "C0456DEF",
-      workspaceName: "Project Workspace",
+      instanceUrl: 'https://test.service-now.com',
+      username: 'admin.test',
+      password: '********',
     },
   ]);
 
-  // Edit dialog state
+  // Edit related statement
   const [editDialog, setEditDialog] = useState({
     isOpen: false,
-    setting: null,
+    credential: null,
     formData: {
-      botToken: '',
-      appToken: '',
-      channelId: '',
-      workspaceName: '',
+      instanceUrl: '',
+      username: '',
+      password: '',
     }
   });
 
-  // Confirm dialog state
   const [confirmDialog, setConfirmDialog] = useState({
     isOpen: false,
     action: null,
     title: '',
     description: '',
-    settingId: null
+    credentialId: null
   });
 
-  // Handle edit button click
-  const handleEdit = (setting) => {
+  // Open the edition dialog
+  const handleEdit = (credential) => {
     setEditDialog({
       isOpen: true,
-      setting,
+      credential,
       formData: {
-        botToken: setting.botToken,
-        appToken: setting.appToken,
-        channelId: setting.channelId,
-        workspaceName: setting.workspaceName,
+        instanceUrl: credential.instanceUrl,
+        username: credential.username,
+        password: '', // Reset PW
       }
     });
   };
 
-  // Handle delete button click
-  const handleDelete = (setting) => {
+  const handleDelete = (credential) => {
     setConfirmDialog({
       isOpen: true,
       action: 'delete',
-      title: 'Delete Slack Connection',
-      description: `Are you sure you want to delete the connection for workspace "${setting.workspaceName}"? This action cannot be undone.`,
-      settingId: setting.id
+      title: 'Delete Credential',
+      description: `Are you sure you want to delete the credential for ${credential.username}? This action cannot be undone.`,
+      credentialId: credential.id
     });
   };
 
-  // Handle new settings input change
+  // Precess new settings change
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setNewSettings(prev => ({
@@ -95,36 +89,37 @@ function SlackSettings() {
     }));
   };
 
-  // Handle new settings form submit
+  // Precess new settings list submit
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       // TODO: Add backend API
       console.log('Saving new settings:', newSettings);
       
-      // Add to settings list
-      const newSetting = {
-        id: Date.now(),
+      // Add to credential list
+      const newCredential = {
+        id: Date.now(), // Timestamp as temporary ID
         ...newSettings,
+        password: '********' // Unshown the actrual PW
       };
       
-      setSettings(prev => [...prev, newSetting]);
+      setCredentials(prev => [...prev, newCredential]);
       
-      // Clear the form
+      // Clear the list
       setNewSettings({
-        botToken: '',
-        appToken: '',
-        channelId: '',
-        workspaceName: '',
+        instanceUrl: '',
+        username: '',
+        password: '',
       });
       
     } catch (error) {
       console.error('Failed to save settings:', error);
+      // TODO: Add UI for Error Message
       alert('Failed to save settings. Please try again.');
     }
   };
 
-  // Handle edit form input change
+  // Process list change
   const handleEditFormChange = (e) => {
     const { name, value } = e.target;
     setEditDialog(prev => ({
@@ -136,27 +131,34 @@ function SlackSettings() {
     }));
   };
 
-  // Handle save edit button click
+  // Process edition saving
   const handleSaveEdit = () => {
     setConfirmDialog({
       isOpen: true,
       action: 'save-edit',
       title: 'Confirm Changes',
-      description: 'Are you sure you want to save these changes to the Slack connection? This action will update the stored information.'
+      description: 'Are you sure you want to save these changes to the credential? This action will update the stored information.'
     });
   };
 
-  // Handle confirm action
+  // Confirm action (save or delete)
   const handleConfirmAction = () => {
     if (confirmDialog.action === 'save-edit') {
-      setSettings(prev => prev.map(setting => 
-        setting.id === editDialog.setting.id
-          ? { ...setting, ...editDialog.formData }
-          : setting
+      // Update credential
+      setCredentials(prev => prev.map(cred => 
+        cred.id === editDialog.credential.id
+          ? { 
+              ...cred, 
+              ...editDialog.formData,
+              password: editDialog.formData.password ? '********' : cred.password 
+            }
+          : cred
       ));
     } else if (confirmDialog.action === 'delete') {
-      setSettings(prev => prev.filter(setting => setting.id !== confirmDialog.settingId));
+      // Delete credential
+      setCredentials(prev => prev.filter(cred => cred.id !== confirmDialog.credentialId));
     }
+    // Clear dialogs
     handleCloseDialogs();
   };
 
@@ -164,12 +166,11 @@ function SlackSettings() {
   const handleCloseDialogs = () => {
     setEditDialog({
       isOpen: false,
-      setting: null,
+      credential: null,
       formData: {
-        botToken: '',
-        appToken: '',
-        channelId: '',
-        workspaceName: '',
+        instanceUrl: '',
+        username: '',
+        password: '',
       }
     });
     setConfirmDialog({
@@ -177,107 +178,85 @@ function SlackSettings() {
       action: null,
       title: '',
       description: '',
-      settingId: null
+      credentialId: null
     });
   };
 
   return (
     <div className="space-y-6">
-      {/* Slack Configuration */}
+      {/* ServiceNow Configuration */}
       <div className="bg-white rounded-lg shadow">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Slack Configuration</h2>
+          <h2 className="text-lg font-semibold text-gray-900">ServiceNow Configuration</h2>
         </div>
         <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          {/* Bot Token Input */}
+          {/* Instance URL Input */}
           <div className="space-y-2">
-            <label htmlFor="botToken" className="block text-sm font-medium text-gray-700">
-              Bot Token
+            <label htmlFor="instanceUrl" className="block text-sm font-medium text-gray-700">
+              Instance URL
+            </label>
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Globe className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="url"
+                id="instanceUrl"
+                name="instanceUrl"
+                value={newSettings.instanceUrl}
+                onChange={handleInputChange}
+                className="block w-full pl-10 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="https://your-instance.service-now.com"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Username Input */}
+          <div className="space-y-2">
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+              Username
+            </label>
+            <div className="relative rounded-md shadow-sm">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <User className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                id="username"
+                name="username"
+                value={newSettings.username}
+                onChange={handleInputChange}
+                className="block w-full pl-10 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Enter username"
+                required
+              />
+            </div>
+          </div>
+
+          {/* Password Input */}
+          <div className="space-y-2">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              Password
             </label>
             <div className="relative rounded-md shadow-sm">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Key className="h-5 w-5 text-gray-400" />
               </div>
               <input
-                type="text"
-                id="botToken"
-                name="botToken"
-                value={newSettings.botToken}
+                type="password"
+                id="password"
+                name="password"
+                value={newSettings.password}
                 onChange={handleInputChange}
                 className="block w-full pl-10 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter Bot Token (xoxb-...)"
+                placeholder="Enter password"
                 required
               />
             </div>
           </div>
 
-          {/* App Token Input */}
-          <div className="space-y-2">
-            <label htmlFor="appToken" className="block text-sm font-medium text-gray-700">
-              App Token
-            </label>
-            <div className="relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Key className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                id="appToken"
-                name="appToken"
-                value={newSettings.appToken}
-                onChange={handleInputChange}
-                className="block w-full pl-10 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter App Token (xapp-...)"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Channel ID Input */}
-          <div className="space-y-2">
-            <label htmlFor="channelId" className="block text-sm font-medium text-gray-700">
-              Channel ID
-            </label>
-            <div className="relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Hash className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                id="channelId"
-                name="channelId"
-                value={newSettings.channelId}
-                onChange={handleInputChange}
-                className="block w-full pl-10 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter Channel ID"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Workspace Name Input */}
-          <div className="space-y-2">
-            <label htmlFor="workspaceName" className="block text-sm font-medium text-gray-700">
-              Workspace Name
-            </label>
-            <div className="relative rounded-md shadow-sm">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Briefcase className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                id="workspaceName"
-                name="workspaceName"
-                value={newSettings.workspaceName}
-                onChange={handleInputChange}
-                className="block w-full pl-10 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                placeholder="Enter Workspace Name"
-                required
-              />
-            </div>
-          </div>
-
-          {/* Save Button */}
+          {/* Save */}
           <div className="flex justify-end">
             <Button
               type="submit"
@@ -290,37 +269,35 @@ function SlackSettings() {
         </form>
       </div>
 
-      {/* Slack Connections Management */}
+      {/* Credentials Management Module */}
       <div className="bg-white rounded-lg shadow">
         <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">Slack Connections Management</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Credentials Management</h2>
         </div>
         
         <div className="min-w-full">
           {/* Table Header */}
           <div className="bg-gray-50 border-b border-gray-200">
-            <div className="grid grid-cols-5 gap-4 px-6 py-3">
-              <div className="text-xs font-medium text-gray-500 uppercase">Workspace</div>
-              <div className="text-xs font-medium text-gray-500 uppercase">Channel ID</div>
-              <div className="text-xs font-medium text-gray-500 uppercase">Bot Token</div>
-              <div className="text-xs font-medium text-gray-500 uppercase">App Token</div>
+            <div className="grid grid-cols-4 gap-4 px-6 py-3">
+              <div className="text-xs font-medium text-gray-500 uppercase">Instance URL</div>
+              <div className="text-xs font-medium text-gray-500 uppercase">Username</div>
+              <div className="text-xs font-medium text-gray-500 uppercase">Password</div>
               <div className="text-xs font-medium text-gray-500 uppercase">Actions</div>
             </div>
           </div>
 
           {/* Table Body */}
           <div className="divide-y divide-gray-200">
-            {settings.map((setting) => (
-              <div key={setting.id} className="grid grid-cols-5 gap-4 px-6 py-4 hover:bg-gray-50">
-                <div className="text-sm text-gray-900">{setting.workspaceName}</div>
-                <div className="text-sm text-gray-900">{setting.channelId}</div>
-                <div className="text-sm text-gray-900">{`${setting.botToken.substring(0, 8)}...`}</div>
-                <div className="text-sm text-gray-900">{`${setting.appToken.substring(0, 8)}...`}</div>
+            {credentials.map((cred) => (
+              <div key={cred.id} className="grid grid-cols-4 gap-4 px-6 py-4 hover:bg-gray-50">
+                <div className="text-sm text-gray-900">{cred.instanceUrl}</div>
+                <div className="text-sm text-gray-900">{cred.username}</div>
+                <div className="text-sm text-gray-900">{cred.password}</div>
                 <div className="flex items-center">
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleEdit(setting)}
+                    onClick={() => handleEdit(cred)}
                     className="text-gray-400 hover:text-blue-600"
                   >
                     <Edit2 className="h-4 w-4" />
@@ -328,7 +305,7 @@ function SlackSettings() {
                   <Button
                     variant="ghost"
                     size="icon"
-                    onClick={() => handleDelete(setting)}
+                    onClick={() => handleDelete(cred)}
                     className="text-gray-400 hover:text-red-600"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -448,4 +425,4 @@ function SlackSettings() {
 
 }
 
-export default SlackSettings;
+export default ServicenowSettings;
