@@ -10,8 +10,13 @@ function DocumentsPage() {
       try {
         const response = await fetch('http://localhost:3001/api/documents/list');
         const data = await response.json();
-        console.log('Fetched documents:', data);
-        setDocuments(data);
+        const processedData = data.map(doc => ({
+          ...doc,
+          id: doc._id, 
+          mimetype: doc.mimetype 
+        }));
+        console.log('Fetched documents:', processedData);
+        setDocuments(processedData);
       } catch (error) {
         console.error('Error fetching documents:', error);
       }

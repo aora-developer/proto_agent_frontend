@@ -21,21 +21,25 @@ function FileList({ documents = [], onDelete }) {
 
   const handlePreview = async (document) => {
     try {
-      const response = await fetch(`/api/documents/${document._id}/content`);
+      console.log('Preview document:', document);
+      const response = await fetch(`http://localhost:3001/api/documents/${document._id}/content`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
+      const data = await response.json();
+      console.log('Preview response:', data); 
       
       setPreviewDoc({
         ...document,
-        url: url
+        url: data.url,
+        type: data.type || document.mimetype || document.type, 
+        name: document.name
       });
     } catch (error) {
       console.error('Preview error:', error);
+      alert('Failed to load document preview. Please try again.');
     }
   };
 
@@ -172,7 +176,9 @@ function FileList({ documents = [], onDelete }) {
       {previewDoc && (
         <FilePreview
           document={previewDoc}
-          onClose={() => setPreviewDoc(null)}
+          onClose={() => {
+            setPreviewDoc(null);
+          }}
         />
       )}
     </div>
